@@ -18,11 +18,11 @@ jobs:
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
             cd ~/personalization-ml
-
+          
             git pull origin dev
-
+          
             source venv/bin/activate
-
+          
             pip install -r requirements.txt
-
-            pm2 restart backend || pm2 start "uvicorn main:app --host 0.0.0.0 --port 8000" --name backend
+          
+            pm2 restart personalize || pm2 start "uvicorn app.main:app --host 0.0.0.0 --port 8000" --name personalize
