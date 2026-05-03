@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "intercept": 7.0,
+  "coef": [-10.0, 0.0, 0.0, 0.0, 0.0, -2.0, -4.0],
+  "feature_names": [
+    "severity",
+    "age_norm",
+    "num_problem_sounds_norm",
+    "hist_pass_rate",
+    "hist_mean_severity",
+    "level_intermediate",
+    "level_advanced"
+  ],
+  "clip_low": { "beginner": 0.45, "intermediate": 0.35, "advanced": 0.15 },
+  "clip_high": { "beginner": 0.85, "intermediate": 0.65, "advanced": 0.45 }
+}

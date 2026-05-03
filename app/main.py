@@ -8,9 +8,15 @@ from pydantic import BaseModel, Field
 
 from app.bandit_linucb import get_selector
 from app.hint_templates import choose_template_id, render_hint
-from app.speech_policy import normalize_speech_level, predict_speech_level_after
+from app.speech_policy import (
+    is_pass_for_level,
+    normalize_speech_level,
+    next_speech_level_from_history,
+    predict_speech_level_after,
+)
+from app.speech_threshold_lr import get_speech_threshold_model
 
-MODEL_VERSION = "local-v0.1.0"
+MODEL_VERSION = "local-v0.2.0"
 API_KEY = os.environ.get("ML_INTERNAL_API_KEY", "")
 
 _log = logging.getLogger("teratalk_ml")
@@ -58,8 +64,13 @@ class SelectWordResponse(BaseModel):
 
 class SpeechLevelRequest(BaseModel):
     speech_level_before: str
-    history_with_current: list[bool]
+    """Most recent attempt first (same order as legacy `history_with_current`)."""
+    history_before: list[bool] = Field(default_factory=list)
     severity: float | None = None
+    age: float | None = None
+    num_problem_sounds: int = 0
+    hist_pass_rate: float | None = None
+    hist_mean_severity: float | None = None
 
 
 class SpeechLevelResponse(BaseModel):
@@ -159,17 +170,37 @@ def speech_level(
 ) -> SpeechLevelResponse:
     _auth(authorization)
     _log.info(
-        "POST /v1/speech-level/predict | before=%s | history_len=%d | severity=%s",
+        "POST /v1/speech-level/predict | before=%s | history_before_len=%d | severity=%s",
         body.speech_level_before,
-        len(body.history_with_current),
+        len(body.history_before),
         body.severity,
     )
     before = normalize_speech_level(body.speech_level_before)
-    after, is_pass, thr = predict_speech_level_after(
-        before,
-        body.history_with_current,
-        body.severity,
-    )
+    try:
+        model = get_speech_threshold_model()
+        is_pass, thr = model.predict_pass(
+            body.severity,
+            before,
+            body.age,
+            body.num_problem_sounds,
+            body.hist_pass_rate,
+            body.hist_mean_severity,
+            len(body.history_before),
+        )
+        history_with_current = [is_pass] + body.history_before
+        after = next_speech_level_from_history(before, history_with_current)
+    except FileNotFoundError:
+        _log.warning("Speech threshold model missing; falling back to static policy")
+        if body.severity is not None and body.severity == body.severity:
+            pass_baseline = is_pass_for_level(before, float(body.severity))
+        else:
+            pass_baseline = False
+        history_with_current = [pass_baseline] + body.history_before
+        after, is_pass, thr = predict_speech_level_after(
+            before,
+            history_with_current,
+            body.severity,
+        )
     _log.info(
         "POST /v1/speech-level/predict | done | after=%s | is_pass=%s | threshold=%.2f",
         after,
