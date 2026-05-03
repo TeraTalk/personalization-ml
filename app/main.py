@@ -16,7 +16,11 @@ API_KEY = os.environ.get("ML_INTERNAL_API_KEY", "")
 _log = logging.getLogger("teratalk_ml")
 if not _log.handlers:
     _h = logging.StreamHandler(sys.stdout)
-    _h.setFormatter(logging.Formatter("%(asctime)s | ML | %(levelname)s | %(message)s", datefmt="%H:%M:%S"))
+    _h.setFormatter(
+        logging.Formatter(
+            "%(asctime)s | ML | %(levelname)s | %(message)s", datefmt="%H:%M:%S"
+        )
+    )
     _log.addHandler(_h)
     _log.setLevel(logging.INFO)
 
@@ -91,7 +95,7 @@ class BanditRewardRequest(BaseModel):
 @app.get("/health")
 def health() -> dict[str, str]:
     _log.info("GET /health")
-    return {"status": "ok", "model_version": MODEL_VERSION}
+    return {"status": "ok", "model_version": MODEL_VERSION, "message": "its live"}
 
 
 @app.post("/v1/bandit/select-word", response_model=SelectWordResponse)
@@ -196,6 +200,8 @@ def hint_template(
     tid = choose_template_id(body.hint_tone, body.attempt, body.severity)
     text = render_hint(tid, body.expected_word, body.expected_sound)
     preview = text if len(text) <= 120 else text[:117] + "..."
-    _log.info("POST /v1/hint/template | done | template_id=%s | hint_len=%d", tid, len(text))
+    _log.info(
+        "POST /v1/hint/template | done | template_id=%s | hint_len=%d", tid, len(text)
+    )
     _log.info("POST /v1/hint/template | hint_text=%s", preview)
     return HintResponse(template_id=tid, hint_text=text, model_version=MODEL_VERSION)
