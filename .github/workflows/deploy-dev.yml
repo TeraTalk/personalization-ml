@@ -25,4 +25,4 @@ jobs:
           
             pip install -r requirements.txt
           
-            pm2 restart personalize || pm2 start "uvicorn app.main:app --host 0.0.0.0 --port 8000" --name personalize
+            pm2 restart teratalk-ml
