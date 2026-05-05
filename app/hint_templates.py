@@ -13,9 +13,9 @@ def choose_template_id(hint_tone: str | None, attempt: int, severity: float | No
         sev = 0.5
     else:
         sev = max(0.0, min(1.0, float(severity)))
-    if t == "direct" or sev > 0.5:
+    if t == "direct" or sev > 0.65:
         return "retry_focus"
-    if t == "supportive" or attempt >= 2 or sev > 0.35:
+    if t == "supportive" or attempt >= 2 or sev > 0.4:
         return "retry_slow"
     return "retry_soft"
 

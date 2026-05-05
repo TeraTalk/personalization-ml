@@ -40,7 +40,7 @@ If `ML_SERVICE_URL` is unset, the backend skips all ML calls.
 
 ## Speech threshold model (personalized pass cutoff)
 
-The bundled `intercept` and severity coefficient in `speech_threshold_lr.json` are set so that, with zero contribution from age / problem-sounds / history features (their coefficients are 0 in the default model), pass/fail boundaries match the static cutoffs: beginner 0.5 / intermediate 0.35 / advanced 0.2. Non-zero context features then shift the boundary via the same linear model. `clip_low` / `clip_high` bound the reported personalized threshold.
+The bundled `intercept` and severity coefficient in `speech_threshold_lr.json` are set so that, with zero contribution from age / problem-sounds / history features (their coefficients are 0 in the default model), pass/fail boundaries match the static cutoffs: beginner 0.65 / intermediate 0.4 / advanced 0.2. Non-zero context features then shift the boundary via the same linear model. `clip_low` / `clip_high` bound the reported personalized threshold.
 
 Retrain from labeled rows (export from your DB into CSV):
 

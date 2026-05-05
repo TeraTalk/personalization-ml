@@ -5,8 +5,8 @@ from typing import Literal
 SpeechLevel = Literal["beginner", "intermediate", "advanced"]
 
 SPEECH_LEVEL_THRESHOLDS: dict[SpeechLevel, float] = {
-    "beginner": 0.5,
-    "intermediate": 0.35,
+    "beginner": 0.65,
+    "intermediate": 0.4,
     "advanced": 0.2,
 }
 

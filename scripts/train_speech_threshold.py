@@ -24,8 +24,8 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_auc_score
 
-CLIP_LOW = {"beginner": 0.25, "intermediate": 0.2, "advanced": 0.05}
-CLIP_HIGH = {"beginner": 0.65, "intermediate": 0.5, "advanced": 0.35}
+CLIP_LOW = {"beginner": 0.4, "intermediate": 0.25, "advanced": 0.05}
+CLIP_HIGH = {"beginner": 0.8, "intermediate": 0.55, "advanced": 0.35}
 
 
 def build_X(df: pd.DataFrame) -> np.ndarray:
